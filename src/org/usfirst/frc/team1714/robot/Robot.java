@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.Encoder;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -18,6 +21,9 @@ public class Robot extends IterativeRobot {
     final String customAuto = "My Auto";
     String autoSelected;
     SendableChooser chooser;
+    CANTalon talon;
+    DigitalInput lswitch;
+    Encoder encoder;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -28,6 +34,10 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
+        talon = new CANTalon(2);
+        lswitch = new DigitalInput(5);
+        encoder = new Encoder(1,2);
+        
     }
     
 	/**
@@ -64,7 +74,19 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    	if(!lswitch.get()){
+        	encoder.reset();
+        	talon.set(0.75);
+        }
         
+        if(encoder.getDistance()>10000){
+        	Timer.delay(1);
+        	talon.set(-1);
+        }
+        else if(encoder.getDistance()<0){
+        	talon.set(0);
+        }
+        System.out.println(encoder.getDistance());
     }
     
     /**
